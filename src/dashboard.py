@@ -4,13 +4,16 @@ import base64
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from dotenv import load_dotenv
+
+# Carregar variáveis de ambiente
+load_dotenv()
 
 # Configuração da página
 st.set_page_config(
     page_title="Dashboard de Transferências - Completo",
     layout="wide"
 )
-
 
 @st.cache_data
 def load_data(csv_path: str) -> pd.DataFrame:
@@ -22,27 +25,16 @@ def load_data(csv_path: str) -> pd.DataFrame:
     df["Valor"] = pd.to_numeric(df["Valor"], errors="coerce")
     return df
 
-
 def format_currency(n):
     """Formata número como moeda: separador de milhares = ponto; decimal = vírgula."""
     return f"{n:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-
 
 def format_int(n):
     """Formata número inteiro: separador de milhares = ponto."""
     return f"{n:,}".replace(",", "X").replace(".", ",").replace("X", ".")
 
-
-def get_base64_image(image_path: str) -> str:
-    """Retorna a imagem codificada em base64."""
-    if os.path.isfile(image_path):
-        with open(image_path, "rb") as f:
-            return base64.b64encode(f.read()).decode()
-    return ""
-
-
 # Caminhos e carregamento dos dados
-csv_file_path = "data/processed/transferencias_processed.csv"
+csv_file_path = os.getenv("ARQUIVO_TRANSFERENCIAS_PROCESSED")
 df = load_data(csv_file_path)
 if df.empty:
     st.stop()
@@ -68,7 +60,7 @@ df_map = df_entrada.groupby("UF").agg({
 df_map.columns = ["UF", "Total_Gasto", "Total_Contratacoes"]
 
 # Carregar GeoJSON dos estados
-geojson_path = "data/external/br_states.json"
+geojson_path = os.getenv("ARQUIVO_GEOJSON")
 if os.path.isfile(geojson_path):
     with open(geojson_path, "r", encoding="utf-8") as f:
         states_geojson = json.load(f)
@@ -83,9 +75,6 @@ if states_geojson is not None:
     df_map_full = df_all_states.merge(df_map, on="UF", how="left").fillna(0)
 else:
     df_map_full = df_map
-
-# Carregar imagem de fundo (não utilizada neste exemplo, pois o fundo é branco)
-background_image = get_base64_image("data/images/background_stadium.png")
 
 # CSS para fundo branco e texto preto negrito com fonte Open Sans
 css_code = """
@@ -249,7 +238,7 @@ with col1:
     st.markdown(
         f"""
         <div class="metric-card">
-            <div class="metric-title">💰 Valor Total Gastado</div>
+            <div class="metric-title">💰 Valor Total Gasto</div>
             <div class="metric-value">R$ {format_currency(valor_total_gasto)}</div>
         </div>
         <div class="metric-card">
