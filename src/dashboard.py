@@ -50,6 +50,10 @@ if df_entrada.empty:
 valor_total_gasto = df_entrada["Valor"].sum()
 total_contratacoes = len(df_entrada)
 total_emprestimos = len(df_entrada[df_entrada["Empréstimo"].str.lower() == "sim"])
+contratacoes_com_custo = len(df_entrada[df_entrada["Valor"] > 0])
+contratacoes_gratuitas = len(df_entrada[df_entrada["Valor"] == 0])
+ticket_medio = valor_total_gasto / total_contratacoes
+ticket_medio_com_custo = valor_total_gasto / contratacoes_com_custo
 
 # Agrupamento para o mapa
 df_map = df_entrada.groupby("UF").agg({
@@ -237,15 +241,31 @@ with col1:
     st.markdown(
         f"""
         <div class="metric-card">
-            <div class="metric-title">💰 Valor Total Gasto</div>
+            <div class="metric-title">Valor Total Gasto</div>
             <div class="metric-value">R$ {format_currency(valor_total_gasto)}</div>
         </div>
         <div class="metric-card">
-            <div class="metric-title">📋 Total de Contratações</div>
+            <div class="metric-title">Total de Contratações</div>
             <div class="metric-value">{format_int(total_contratacoes)}</div>
         </div>
         <div class="metric-card">
-            <div class="metric-title">🔄 Total de Empréstimos</div>
+            <div class="metric-title">Ticket Médio - Total</div>
+            <div class="metric-value">R$ {format_currency(ticket_medio)}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-title">Contratações - Com Custo</div>
+            <div class="metric-value">{format_int(contratacoes_com_custo)}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-title">Ticket Médio - Com Custo</div>
+            <div class="metric-value">R$ {format_currency(ticket_medio_com_custo)}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-title">Contratações - Gratuítas</div>
+            <div class="metric-value">{format_int(contratacoes_gratuitas)}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-title">Total de Empréstimos</div>
             <div class="metric-value">{format_int(total_emprestimos)}</div>
         </div>
         """,
