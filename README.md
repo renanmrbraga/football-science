@@ -66,14 +66,9 @@ pip install -r requirements.txt
 - Certifique-se de que o banco de dados (PostgreSQL) esteja rodando.
 - Configurar as credenciais no arquivo `.env`.
 
-### 5. Executar a coleta de dados
+### 5. Iniciar o Dashboard
 ```bash
-python src/coletar_dados.py
-```
-
-### 6. Iniciar o Dashboard
-```bash
-streamlit run dashboards/dashboard.py  # Para visualização dos dados
+streamlit run src/dashboard.py  # Para visualização dos dados
 ```
 
 ## Contribuição
