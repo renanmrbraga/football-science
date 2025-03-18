@@ -11,18 +11,17 @@ load_dotenv()
 
 # Configuração da página
 st.set_page_config(
-    page_title="Dashboard de Transferências - Completo",
+    page_title="Dashboard Completo",
     layout="wide"
 )
 
 @st.cache_data
 def load_data(csv_path: str) -> pd.DataFrame:
-    """Carrega dados do CSV e converte a coluna 'Valor' para numérico."""
+    """Carrega dados do CSV."""
     if not os.path.isfile(csv_path):
         st.error(f"Arquivo não encontrado: {csv_path}")
         return pd.DataFrame()
     df = pd.read_csv(csv_path, sep=';', encoding='utf-8')
-    df["Valor"] = pd.to_numeric(df["Valor"], errors="coerce")
     return df
 
 def format_currency(n):
@@ -39,7 +38,7 @@ df = load_data(csv_file_path)
 if df.empty:
     st.stop()
 
-st.title("Transferências dos Clubes da Série A - Últimos 10 Anos")
+st.title("Transferências de Todos Clubes da Série A dos Últimos 10 Anos")
 
 # Filtrar entradas
 df_entrada = df[df["Tipo"].str.lower() == "entrada"]
@@ -76,7 +75,7 @@ if states_geojson is not None:
 else:
     df_map_full = df_map
 
-# CSS para fundo branco e texto preto negrito com fonte Open Sans
+# Configuração CSS
 css_code = """
 <style>
 /* Remover fundo do cabeçalho e ajustar container */
