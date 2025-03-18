@@ -37,7 +37,7 @@ footballanalysis/
 |   |-- preprocessing/   # Scripts de pré-processamento
 |   |-- analysis/        # Análises exploratórias e estatísticas
 |   |-- visualization/   # Dashboards e relatórios
-|-- |__ dashboard.py     # Dashboard interativo
+|   |__ dashboard.py     # Dashboard interativo
 |-- .gitignore           # Arquivo .gitignore
 |-- LICENSE              # Arquivo de licença
 |-- README.md            # Documentação do projeto
