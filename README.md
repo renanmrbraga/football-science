@@ -8,7 +8,7 @@ As principais tecnologias utilizadas serão:
 - **Power BI**
 - **Streamlit + Python**
 - **Pandas e NumPy para manipulação de dados**
-- **Matplotlib e Seaborn para visualização**
+- **Matplotlib, Seaborn e Plotly para visualização**
 - **PostgreSQL para armazenamento dos dados estruturados**
 - **APIs e Web Scraping para coleta de dados**
 
@@ -33,13 +33,15 @@ Serão utilizadas ferramentas como **BeautifulSoup** e **Selenium** para coletar
 footballanalysis/
 |-- data/                # Conjunto de dados
 |-- notebooks/           # Jupyter Notebooks para exploração dos dados
-|-- dashboards/          # Dashboards interativos
 |-- src/                 # Código-fonte principal do projeto
 |   |-- preprocessing/   # Scripts de pré-processamento
 |   |-- analysis/        # Análises exploratórias e estatísticas
 |   |-- visualization/   # Dashboards e relatórios
-|-- requirements.txt     # Dependências do projeto
+|-- |__ dashboard.py     # Dashboard interativo
+|-- .gitignore           # Arquivo .gitignore
+|-- LICENSE              # Arquivo de licença
 |-- README.md            # Documentação do projeto
+|__ requirements.txt     # Dependências do projeto
 ```
 
 ## Instalação e Configuração
@@ -62,7 +64,7 @@ venv\Scripts\activate     # Para Windows
 pip install -r requirements.txt
 ```
 
-### 4. Configurar o banco de dados
+### 4. Configurar o banco de dados (será adicionado no futuro)
 - Certifique-se de que o banco de dados (PostgreSQL) esteja rodando.
 - Configurar as credenciais no arquivo `.env`.
 
