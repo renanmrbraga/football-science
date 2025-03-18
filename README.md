@@ -31,17 +31,17 @@ Serão utilizadas ferramentas como **BeautifulSoup** e **Selenium** para coletar
 ## Estrutura do Projeto
 ```
 footballanalysis/
-|-- data/                # Conjunto de dados
-|-- notebooks/           # Jupyter Notebooks para exploração dos dados
-|-- src/                 # Código-fonte principal do projeto
-|   |-- preprocessing/   # Scripts de pré-processamento
-|   |-- analysis/        # Análises exploratórias e estatísticas
-|   |-- visualization/   # Dashboards e relatórios
-|   |__ dashboard.py     # Dashboard interativo
-|-- .gitignore           # Arquivo .gitignore
-|-- LICENSE              # Arquivo de licença
-|-- README.md            # Documentação do projeto
-|__ requirements.txt     # Dependências do projeto
+├── data/                # Conjunto de dados
+├── notebooks/           # Jupyter Notebooks para exploração dos dados
+├── src/                 # Código-fonte principal do projeto
+│   ├── preprocessing/   # Scripts de pré-processamento
+│   ├── analysis/        # Análises exploratórias e estatísticas
+│   ├── visualization/   # Dashboards e relatórios
+│   └── dashboard.py     # Dashboard interativo
+├── .gitignore           # Arquivo .gitignore
+├── LICENSE              # Arquivo de licença
+├── README.md            # Documentação do projeto
+└── requirements.txt     # Dependências do projeto
 ```
 
 ## Instalação e Configuração
