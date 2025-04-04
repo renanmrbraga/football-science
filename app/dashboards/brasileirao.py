@@ -31,17 +31,19 @@ def dashboard_brasileirao():
     df_info = df_clubes[df_clubes["Nome Oficial"] == clube].iloc[0]
 
     st.subheader("Indicadores Gerais")
+
+    # Linha 1
     col1, col2, col3, col4 = st.columns(4)
     col1.metric(METRICS["participacoes"], df_info["Participacoes_SerieA"])
-    col1.metric(METRICS["rebaixamentos"], df_info["Rebaixamentos"])
-
     col2.metric(METRICS["media_pontos"], round(df_info["Media_Pontos"], 2))
-    col2.metric(METRICS["aproveitamento"], round(df_info["Aproveitamento(%)"], 2))
-
     col3.metric(METRICS["ultimo_ano"], int(df_info["Ultimo_Ano_SerieA"]))
-    col3.metric(METRICS["internacionais"], df_info["Participacoes_Internacionais"])
-
     col4.metric(METRICS["saldo_transferencias"], format_currency(df_info["Saldo_Transferencias_R$"]))
+
+    # Linha 2
+    col5, col6, col7 = st.columns(3)
+    col5.metric(METRICS["rebaixamentos"], df_info["Rebaixamentos"])
+    col6.metric(METRICS["aproveitamento"], round(df_info["Aproveitamento(%)"], 2))
+    col7.metric(METRICS["internacionais"], df_info["Participacoes_Internacionais"])
 
     # Gráfico posição
     st.subheader(CHARTS["evolucao_brasileirao"])
@@ -58,13 +60,9 @@ def dashboard_brasileirao():
     df_transf_clube["Valor"] = df_transf_clube["Valor"].apply(lambda x: f"R$ {x:,.2f}")
     tab_in, tab_out = st.tabs(["Entradas", "Saídas"])
     with tab_in:
-        st.dataframe(df_transf_clube[df_transf_clube["Tipo"].str.lower() == "entrada"][[
-            "Ano", "Origem_Destino", "Valor", "Empréstimo"
-        ]])
+        st.dataframe(df_transf_clube[df_transf_clube["Tipo"].str.lower() == "entrada"][[ "Ano", "Origem_Destino", "Valor", "Empréstimo" ]])
     with tab_out:
-        st.dataframe(df_transf_clube[df_transf_clube["Tipo"].str.lower() == "saída"][[
-            "Ano", "Origem_Destino", "Valor", "Empréstimo"
-        ]])
+        st.dataframe(df_transf_clube[df_transf_clube["Tipo"].str.lower() == "saída"][[ "Ano", "Origem_Destino", "Valor", "Empréstimo" ]])
 
     # Gráfico transf
     st.subheader(CHARTS["investimentos"])

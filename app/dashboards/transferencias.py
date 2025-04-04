@@ -1,13 +1,12 @@
 # app/dashboards/transferencias.py
-import json
-import pandas as pd
-import plotly.express as px
 import streamlit as st
+import plotly.express as px
+import pandas as pd
 from app.utils.data import load_data, enrich_with_uf, ensure_all_ufs
 from app.utils.geo import load_geojson
 from app.components.utils import format_currency, format_int, style_plotly, style_map
 from app.constants.paths import CLUBES_CSV, TRANSFERENCIAS_CSV, GEOJSON_PATH
-from app.constants.texts import TITLE_TRANSFERENCIAS, WARNING_EMPTY_ENTRADAS
+from app.constants.texts import TITLE_TRANSFERENCIAS, WARNING_EMPTY_ENTRADAS, METRICS, CHARTS, WARNING_NO_UF_COLUMN
 
 
 def dashboard_transferencias():
@@ -37,27 +36,27 @@ def dashboard_transferencias():
     ticket_medio_com_custo = valor_total_gasto / contratacoes_com_custo if contratacoes_com_custo else 0
 
     st.subheader("Indicadores Gerais")
+
+    # Linha 1
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Valor Total Gasto", f"R$ {format_currency(valor_total_gasto)}")
-    col1.metric("Total de Contratações", format_int(total_contratacoes))
+    col1.metric(METRICS["valor_total"], f"R$ {format_currency(valor_total_gasto)}")
+    col2.metric(METRICS["ticket_medio"], f"R$ {format_currency(ticket_medio)}")
+    col3.metric(METRICS["com_custo"], format_int(contratacoes_com_custo))
+    col4.metric(METRICS["emprestimos"], format_int(total_emprestimos))
 
-    col2.metric("Ticket Médio (Total)", f"R$ {format_currency(ticket_medio)}")
-    col2.metric("Ticket Médio (Com Custo)", f"R$ {format_currency(ticket_medio_com_custo)}")
+    # Linha 2
+    col5, col6, col7 = st.columns(3)
+    col5.metric(METRICS["total_contratacoes"], format_int(total_contratacoes))
+    col6.metric(METRICS["ticket_custo"], f"R$ {format_currency(ticket_medio_com_custo)}")
+    col7.metric(METRICS["gratuitas"], format_int(contratacoes_gratuitas))
 
-    col3.metric("Com Custo", format_int(contratacoes_com_custo))
-    col3.metric("Gratuitas", format_int(contratacoes_gratuitas))
-
-    col4.metric("Empréstimos", format_int(total_emprestimos))
-
+    # Gráficos
     top_10_gastos = df_entrada.groupby("Nome Oficial")["Valor"].sum().nlargest(10).reset_index()
     top_10_gastos["formatted"] = top_10_gastos["Valor"].apply(format_currency)
     grafico_top_gastos = px.bar(
         top_10_gastos.sort_values("Valor"),
-        x="Valor",
-        y="Nome Oficial",
-        title="Top 10 Clubes que Mais Gastaram",
-        orientation="h",
-        text="formatted",
+        x="Valor", y="Nome Oficial", orientation="h",
+        text="formatted", title=CHARTS["top_gastos"],
         color_discrete_sequence=["#003366"]
     )
     style_plotly(grafico_top_gastos)
@@ -65,12 +64,8 @@ def dashboard_transferencias():
     gastos_por_ano = df_entrada.groupby("Ano")["Valor"].sum().reset_index()
     gastos_por_ano["formatted"] = gastos_por_ano["Valor"].apply(format_currency)
     grafico_gastos = px.line(
-        gastos_por_ano,
-        x="Ano",
-        y="Valor",
-        title="Evolução do Gasto por Ano",
-        markers=True,
-        text="formatted",
+        gastos_por_ano, x="Ano", y="Valor", markers=True,
+        text="formatted", title=CHARTS["gastos_ano"],
         color_discrete_sequence=["#003366"]
     )
     style_plotly(grafico_gastos)
@@ -78,20 +73,23 @@ def dashboard_transferencias():
     st.plotly_chart(grafico_top_gastos, use_container_width=True)
     st.plotly_chart(grafico_gastos, use_container_width=True)
 
+    # Mapa
     geojson = load_geojson(GEOJSON_PATH)
     if geojson and "UF" in df_entrada.columns:
         df_map = df_entrada.groupby("UF")["Valor"].sum().reset_index()
         df_map.columns = ["UF", "Total_Gasto"]
         df_map = ensure_all_ufs(df_map, geojson)
+
+        st.subheader(CHARTS["mapa_transferencias"])
         fig_mapa = px.choropleth(
             df_map,
             geojson=geojson,
             locations="UF",
             featureidkey="properties.SIGLA",
             color="Total_Gasto",
-            title="Distribuição Geográfica de Transferências"
+            hover_data=["Total_Gasto"]
         )
         style_map(fig_mapa)
         st.plotly_chart(fig_mapa, use_container_width=True)
     else:
-        st.warning("Coluna 'UF' não encontrada. Mapa não será exibido.")
+        st.warning(WARNING_NO_UF_COLUMN)
