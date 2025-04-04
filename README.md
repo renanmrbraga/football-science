@@ -64,13 +64,9 @@ venv\Scripts\activate     # Para Windows
 pip install -r requirements.txt
 ```
 
-### 4. Configurar o banco de dados (será adicionado no futuro)
-- Certifique-se de que o banco de dados (PostgreSQL) esteja rodando.
-- Configurar as credenciais no arquivo `.env`.
-
-### 5. Iniciar o Dashboard
+### 4. Iniciar o Dashboard
 ```bash
-streamlit run src/dashboard.py  # Para visualização dos dados
+streamlit run run.py
 ```
 
 ## Contribuição
