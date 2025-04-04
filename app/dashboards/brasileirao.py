@@ -32,18 +32,25 @@ def dashboard_brasileirao():
 
     st.subheader("Indicadores Gerais")
 
-    # Linha 1
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric(METRICS["participacoes"], df_info["Participacoes_SerieA"])
-    col2.metric(METRICS["media_pontos"], round(df_info["Media_Pontos"], 2))
-    col3.metric(METRICS["ultimo_ano"], int(df_info["Ultimo_Ano_SerieA"]))
-    col4.metric(METRICS["saldo_transferencias"], format_currency(df_info["Saldo_Transferencias_R$"]))
+    col1, col2 = st.columns(2)
 
-    # Linha 2
-    col5, col6, col7 = st.columns(3)
-    col5.metric(METRICS["rebaixamentos"], df_info["Rebaixamentos"])
-    col6.metric(METRICS["aproveitamento"], round(df_info["Aproveitamento(%)"], 2))
-    col7.metric(METRICS["internacionais"], df_info["Participacoes_Internacionais"])
+    with col1:
+        st.markdown(f"**{METRICS['participacoes']}**")
+        st.markdown(f"#### {df_info['Participacoes_SerieA']}")
+        st.markdown(f"**{METRICS['media_pontos']}**")
+        st.markdown(f"#### {round(df_info['Media_Pontos'], 2)}")
+        st.markdown(f"**{METRICS['ultimo_ano']}**")
+        st.markdown(f"#### {int(df_info['Ultimo_Ano_SerieA'])}")
+        st.markdown(f"**{METRICS['saldo_transferencias']}**")
+        st.markdown(f"#### R$ {format_currency(df_info['Saldo_Transferencias_R$'])}")
+
+    with col2:
+        st.markdown(f"**{METRICS['rebaixamentos']}**")
+        st.markdown(f"#### {df_info['Rebaixamentos']}")
+        st.markdown(f"**{METRICS['aproveitamento']}**")
+        st.markdown(f"#### {round(df_info['Aproveitamento(%)'], 2)}%")
+        st.markdown(f"**{METRICS['internacionais']}**")
+        st.markdown(f"#### {df_info['Participacoes_Internacionais']}")
 
     # Gráfico posição
     st.subheader(CHARTS["evolucao_brasileirao"])

@@ -36,29 +36,26 @@ def dashboard_transferencias():
     ticket_medio_com_custo = valor_total_gasto / contratacoes_com_custo if contratacoes_com_custo else 0
 
     st.subheader("Indicadores Gerais")
-    col1, col2, col3, col4 = st.columns(4)
+
+    col1, col2 = st.columns(2)
 
     with col1:
         st.markdown("**Valor Total Gasto**")
         st.markdown(f"#### R$ {format_currency(valor_total_gasto)}")
-        st.markdown("**Total de Contratações**")
-        st.markdown(f"#### {format_int(total_contratacoes)}")
-
-    with col2:
         st.markdown("**Ticket Médio - Total**")
         st.markdown(f"#### R$ {format_currency(ticket_medio)}")
-        st.markdown("**Ticket Médio - Com Custo**")
-        st.markdown(f"#### R$ {format_currency(ticket_medio_com_custo)}")
-
-    with col3:
         st.markdown("**Contratações - Com Custo**")
         st.markdown(f"#### {format_int(contratacoes_com_custo)}")
-        st.markdown("**Contratações - Gratuitas**")
-        st.markdown(f"#### {format_int(contratacoes_gratuitas)}")
-
-    with col4:
         st.markdown("**Total de Empréstimos**")
         st.markdown(f"#### {format_int(total_emprestimos)}")
+
+    with col2:
+        st.markdown("**Total de Contratações**")
+        st.markdown(f"#### {format_int(total_contratacoes)}")
+        st.markdown("**Ticket Médio - Com Custo**")
+        st.markdown(f"#### R$ {format_currency(ticket_medio_com_custo)}")
+        st.markdown("**Contratações - Gratuitas**")
+        st.markdown(f"#### {format_int(contratacoes_gratuitas)}")
 
     # Linha 2
     col5, col6, col7 = st.columns(3)
