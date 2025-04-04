@@ -28,22 +28,6 @@ Os dados serão coletados a partir de diversas fontes, incluindo:
 ### Web Scraping e APIs
 Serão utilizadas ferramentas como **BeautifulSoup** e **Selenium** para coletar dados financeiros de relatórios anuais e balanços dos clubes. APIs esportivas fornecerão estatísticas sobre partidas, jogadores e classificação ao longo dos anos. Ambos serão feitos no meu projeto [Football Science](https://github.com/renanmrbraga/footballscience).
 
-## Estrutura do Projeto
-```
-footballanalysis/
-├── data/                # Conjunto de dados
-├── notebooks/           # Jupyter Notebooks para exploração dos dados
-├── src/                 # Código-fonte principal do projeto
-│   ├── preprocessing/   # Scripts de pré-processamento
-│   ├── analysis/        # Análises exploratórias e estatísticas
-│   ├── visualization/   # Dashboards e relatórios
-│   └── dashboard.py     # Dashboard interativo
-├── .gitignore           # Arquivo .gitignore
-├── LICENSE              # Arquivo de licença
-├── README.md            # Documentação do projeto
-└── requirements.txt     # Dependências do projeto
-```
-
 ## Instalação e Configuração
 
 ### 1. Clonar o repositório
