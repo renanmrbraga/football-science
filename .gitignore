@@ -8,7 +8,6 @@ venv/
 .vscode/
 
 # Ignorar pastas sensíveis
-data/
 tests/
 
 #Ignorar logs e secrets

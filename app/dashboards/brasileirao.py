@@ -1,0 +1,93 @@
+# app/dashboards/brasileirao.py
+import streamlit as st
+import plotly.express as px
+from app.utils.data import load_data, enrich_with_uf, ensure_all_ufs
+from app.utils.geo import load_geojson
+from app.components.utils import format_currency, style_plotly, style_map
+from app.constants.paths import CLUBES_CSV, TRANSFERENCIAS_CSV, BRASILEIRAO_CSV, GEOJSON_PATH
+from app.constants.texts import TITLE_BRASILEIRAO, METRICS, CHARTS, WARNING_NO_UF_COLUMN, ERROR_LOAD_DATA
+
+
+def dashboard_brasileirao():
+    st.title(TITLE_BRASILEIRAO)
+
+    df_clubes = load_data(CLUBES_CSV)
+    df_transf = load_data(TRANSFERENCIAS_CSV)
+    df_bras = load_data(BRASILEIRAO_CSV)
+
+    if df_clubes.empty or df_transf.empty or df_bras.empty:
+        st.error(ERROR_LOAD_DATA)
+        return
+
+    df_transf = df_transf.merge(df_clubes[["ID", "Nome Oficial"]], left_on="Clube_ID", right_on="ID", how="left")
+    df_transf = enrich_with_uf(df_transf, df_clubes)
+    df_bras = df_bras.merge(df_clubes[["ID", "Nome Oficial"]], left_on="Clube", right_on="Nome Oficial", how="left")
+
+    clubes = sorted(df_clubes["Nome Oficial"].unique())
+    clube = st.sidebar.selectbox("Clube", clubes)
+
+    df_bras_clube = df_bras[df_bras["Nome Oficial"] == clube]
+    df_transf_clube = df_transf[df_transf["Nome Oficial"] == clube].copy()
+    df_info = df_clubes[df_clubes["Nome Oficial"] == clube].iloc[0]
+
+    st.subheader("Indicadores Gerais")
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric(METRICS["participacoes"], df_info["Participacoes_SerieA"])
+    col1.metric(METRICS["rebaixamentos"], df_info["Rebaixamentos"])
+
+    col2.metric(METRICS["media_pontos"], round(df_info["Media_Pontos"], 2))
+    col2.metric(METRICS["aproveitamento"], round(df_info["Aproveitamento(%)"], 2))
+
+    col3.metric(METRICS["ultimo_ano"], int(df_info["Ultimo_Ano_SerieA"]))
+    col3.metric(METRICS["internacionais"], df_info["Participacoes_Internacionais"])
+
+    col4.metric(METRICS["saldo_transferencias"], format_currency(df_info["Saldo_Transferencias_R$"]))
+
+    # Gráfico posição
+    st.subheader(CHARTS["evolucao_brasileirao"])
+    fig_pos = px.line(
+        df_bras_clube, x="Ano", y="Posição",
+        title=CHARTS["posicao_ano"](clube), markers=True
+    )
+    fig_pos.update_yaxes(autorange="reversed")
+    style_plotly(fig_pos)
+    st.plotly_chart(fig_pos, use_container_width=True)
+
+    # Tabela transferências
+    st.subheader(CHARTS["transferencias"])
+    df_transf_clube["Valor"] = df_transf_clube["Valor"].apply(lambda x: f"R$ {x:,.2f}")
+    tab_in, tab_out = st.tabs(["Entradas", "Saídas"])
+    with tab_in:
+        st.dataframe(df_transf_clube[df_transf_clube["Tipo"].str.lower() == "entrada"][[
+            "Ano", "Origem_Destino", "Valor", "Empréstimo"
+        ]])
+    with tab_out:
+        st.dataframe(df_transf_clube[df_transf_clube["Tipo"].str.lower() == "saída"][[
+            "Ano", "Origem_Destino", "Valor", "Empréstimo"
+        ]])
+
+    # Gráfico transf
+    st.subheader(CHARTS["investimentos"])
+    df_grouped = df_transf_clube.groupby(["Ano", "Tipo"])["Valor"].count().reset_index()
+    fig_bar = px.bar(df_grouped, x="Ano", y="Valor", color="Tipo", barmode="group")
+    style_plotly(fig_bar)
+    st.plotly_chart(fig_bar, use_container_width=True)
+
+    # Mapa
+    if GEOJSON_PATH:
+        geojson = load_geojson(GEOJSON_PATH)
+        if geojson is not None and "UF" in df_transf.columns:
+            df_map = df_transf.groupby("UF")["Valor"].sum().reset_index()
+            df_map.columns = ["UF", "Total_Gasto"]
+            df_map = ensure_all_ufs(df_map, geojson)
+
+            st.subheader(CHARTS["mapa_transferencias"])
+            fig_map = px.choropleth(
+                df_map, geojson=geojson, locations="UF", featureidkey="properties.SIGLA",
+                color="Total_Gasto", hover_data=["Total_Gasto"]
+            )
+            fig_map.update_geos(fitbounds="locations", visible=False)
+            style_map(fig_map)
+            st.plotly_chart(fig_map, use_container_width=True)
+        else:
+            st.warning(WARNING_NO_UF_COLUMN)
