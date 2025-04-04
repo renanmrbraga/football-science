@@ -7,7 +7,7 @@ from app.utils.geo import load_geojson
 from app.components.utils import format_currency, format_int, style_plotly, style_map
 from app.constants.paths import CLUBES_CSV, TRANSFERENCIAS_CSV, GEOJSON_PATH
 from app.constants.texts import TITLE_TRANSFERENCIAS, WARNING_EMPTY_ENTRADAS, METRICS, CHARTS, WARNING_NO_UF_COLUMN
-
+from app.constants.colors import PRIMARY_BLUE, BLUE_SCALE
 
 def dashboard_transferencias():
     st.title(TITLE_TRANSFERENCIAS)
@@ -64,7 +64,7 @@ def dashboard_transferencias():
         top_10_gastos.sort_values("Valor"),
         x="Valor", y="Nome Oficial", orientation="h",
         text="formatted", title=CHARTS["top_gastos"],
-        color_discrete_sequence=["#003366"]
+        color_discrete_sequence=BLUE_SCALE
     )
     style_plotly(grafico_top_gastos)
 
@@ -73,7 +73,7 @@ def dashboard_transferencias():
     grafico_gastos = px.line(
         gastos_por_ano, x="Ano", y="Valor", markers=True,
         text="formatted", title=CHARTS["gastos_ano"],
-        color_discrete_sequence=["#003366"]
+        color_discrete_sequence=[PRIMARY_BLUE]
     )
     style_plotly(grafico_gastos)
 

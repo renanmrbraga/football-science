@@ -6,7 +6,7 @@ from app.utils.geo import load_geojson
 from app.components.utils import format_currency, style_plotly, style_map
 from app.constants.paths import CLUBES_CSV, TRANSFERENCIAS_CSV, BRASILEIRAO_CSV, GEOJSON_PATH
 from app.constants.texts import TITLE_BRASILEIRAO, METRICS, CHARTS, WARNING_NO_UF_COLUMN, ERROR_LOAD_DATA
-
+from app.constants.colors import PRIMARY_BLUE, BLUE_SCALE
 
 def dashboard_brasileirao():
     st.title(TITLE_BRASILEIRAO)
@@ -52,33 +52,37 @@ def dashboard_brasileirao():
         st.markdown(f"**{METRICS['internacionais']}**")
         st.markdown(f"#### {df_info['Participacoes_Internacionais']}")
 
-    # Gráfico posição
     st.subheader(CHARTS["evolucao_brasileirao"])
     fig_pos = px.line(
         df_bras_clube, x="Ano", y="Posição",
-        title=CHARTS["posicao_ano"](clube), markers=True
+        title=CHARTS["posicao_ano"](clube), markers=True,
+        color_discrete_sequence=[PRIMARY_BLUE]
     )
     fig_pos.update_yaxes(autorange="reversed")
     style_plotly(fig_pos)
     st.plotly_chart(fig_pos, use_container_width=True)
 
-    # Tabela transferências
     st.subheader(CHARTS["transferencias"])
     df_transf_clube["Valor"] = df_transf_clube["Valor"].apply(lambda x: f"R$ {x:,.2f}")
     tab_in, tab_out = st.tabs(["Entradas", "Saídas"])
     with tab_in:
-        st.dataframe(df_transf_clube[df_transf_clube["Tipo"].str.lower() == "entrada"][[ "Ano", "Origem_Destino", "Valor", "Empréstimo" ]])
+        st.dataframe(df_transf_clube[df_transf_clube["Tipo"].str.lower() == "entrada"][
+            ["Ano", "Origem_Destino", "Valor", "Empréstimo"]
+        ])
     with tab_out:
-        st.dataframe(df_transf_clube[df_transf_clube["Tipo"].str.lower() == "saída"][[ "Ano", "Origem_Destino", "Valor", "Empréstimo" ]])
+        st.dataframe(df_transf_clube[df_transf_clube["Tipo"].str.lower() == "saída"][
+            ["Ano", "Origem_Destino", "Valor", "Empréstimo"]
+        ])
 
-    # Gráfico transf
     st.subheader(CHARTS["investimentos"])
     df_grouped = df_transf_clube.groupby(["Ano", "Tipo"])["Valor"].count().reset_index()
-    fig_bar = px.bar(df_grouped, x="Ano", y="Valor", color="Tipo", barmode="group")
+    fig_bar = px.bar(
+        df_grouped, x="Ano", y="Valor", color="Tipo", barmode="group",
+        title=CHARTS["investimentos"], color_discrete_sequence=BLUE_SCALE
+    )
     style_plotly(fig_bar)
     st.plotly_chart(fig_bar, use_container_width=True)
 
-    # Mapa
     if GEOJSON_PATH:
         geojson = load_geojson(GEOJSON_PATH)
         if geojson is not None and "UF" in df_transf.columns:
