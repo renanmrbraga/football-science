@@ -57,12 +57,6 @@ def dashboard_transferencias():
         st.markdown("**Contratações - Gratuitas**")
         st.markdown(f"#### {format_int(contratacoes_gratuitas)}")
 
-    # Linha 2
-    col5, col6, col7 = st.columns(3)
-    col5.metric(METRICS["total_contratacoes"], format_int(total_contratacoes))
-    col6.metric(METRICS["ticket_custo"], f"R$ {format_currency(ticket_medio_com_custo)}")
-    col7.metric(METRICS["gratuitas"], format_int(contratacoes_gratuitas))
-
     # Gráficos
     top_10_gastos = df_entrada.groupby("Nome Oficial")["Valor"].sum().nlargest(10).reset_index()
     top_10_gastos["formatted"] = top_10_gastos["Valor"].apply(format_currency)
