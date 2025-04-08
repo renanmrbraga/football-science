@@ -8,7 +8,7 @@ from app.constants.paths import CLUBES_CSV, TRANSFERENCIAS_CSV, BRASILEIRAO_CSV,
 from app.constants.texts import TITLE_BRASILEIRAO, METRICS, CHARTS, WARNING_NO_UF_COLUMN, ERROR_LOAD_DATA
 from app.constants.colors import PRIMARY_BLUE, BLUE_SCALE
 
-def dashboard_brasileirao():
+def dashboard_clubes():
     st.title(TITLE_BRASILEIRAO)
 
     df_clubes = load_data(CLUBES_CSV)
@@ -73,21 +73,3 @@ def dashboard_brasileirao():
     )
     style_plotly(fig_bar)
     st.plotly_chart(fig_bar, use_container_width=True)
-
-    if GEOJSON_PATH:
-        geojson = load_geojson(GEOJSON_PATH)
-        if geojson is not None and "UF" in df_transf.columns:
-            df_map = df_transf.groupby("UF")["Valor"].sum().reset_index()
-            df_map.columns = ["UF", "Total_Gasto"]
-            df_map = ensure_all_ufs(df_map, geojson)
-
-            st.subheader(CHARTS["mapa_transferencias"])
-            fig_map = px.choropleth(
-                df_map, geojson=geojson, locations="UF", featureidkey="properties.SIGLA",
-                color="Total_Gasto", hover_data=["Total_Gasto"]
-            )
-            fig_map.update_geos(fitbounds="locations", visible=False)
-            style_map(fig_map)
-            st.plotly_chart(fig_map, use_container_width=True)
-        else:
-            st.warning(WARNING_NO_UF_COLUMN)

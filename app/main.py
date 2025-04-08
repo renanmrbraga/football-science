@@ -1,6 +1,6 @@
 # app/main.py
 import streamlit as st
-from app.dashboards.brasileirao import dashboard_brasileirao
+from app.dashboards.clubes import dashboard_clubes
 from app.dashboards.transferencias import dashboard_transferencias
 from app.components.styles import inject_custom_css
 import logging
@@ -17,7 +17,7 @@ inject_custom_css()
 def main() -> None:
     """Função principal para seleção e exibição dos dashboards."""
     dashboard_options = {
-        "Brasileirão": dashboard_brasileirao,
+        "Clubes": dashboard_clubes,
         "Transferências": dashboard_transferencias
     }
 
