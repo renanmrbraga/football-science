@@ -72,7 +72,7 @@ def dashboard_transferencias():
     gastos_por_ano["formatted"] = gastos_por_ano["Valor"].apply(format_currency)
     grafico_gastos = px.line(
         gastos_por_ano, x="Ano", y="Valor", markers=True,
-        text="formatted", title=CHARTS["gastos_ano"],
+        title=CHARTS["gastos_ano"],
         color_discrete_sequence=[PRIMARY_BLUE]
     )
     style_plotly(grafico_gastos)
