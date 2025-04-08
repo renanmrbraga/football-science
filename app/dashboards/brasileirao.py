@@ -64,15 +64,6 @@ def dashboard_brasileirao():
 
     st.subheader(CHARTS["transferencias"])
     df_transf_clube["Valor"] = df_transf_clube["Valor"].apply(lambda x: f"R$ {x:,.2f}")
-    tab_in, tab_out = st.tabs(["Entradas", "Saídas"])
-    with tab_in:
-        st.dataframe(df_transf_clube[df_transf_clube["Tipo"].str.lower() == "entrada"][
-            ["Ano", "Origem_Destino", "Valor", "Empréstimo"]
-        ])
-    with tab_out:
-        st.dataframe(df_transf_clube[df_transf_clube["Tipo"].str.lower() == "saída"][
-            ["Ano", "Origem_Destino", "Valor", "Empréstimo"]
-        ])
 
     st.subheader(CHARTS["investimentos"])
     df_grouped = df_transf_clube.groupby(["Ano", "Tipo"])["Valor"].count().reset_index()
