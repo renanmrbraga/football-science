@@ -1,21 +1,23 @@
 # app/utils/geo.py
 import json
 import os
+import streamlit as st
 from typing import Optional
 
 def load_geojson(path: str) -> Optional[dict]:
-    """Carrega um arquivo GeoJSON."""
+    """Carrega e ajusta o GeoJSON adicionando a chave 'name' com valor da 'SIGLA' dentro de 'properties'."""
     if not os.path.isfile(path):
         return None
     try:
         with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception as e:
-        return None
+            geojson = json.load(f)
 
-def get_uf_list_from_geojson(geojson: dict) -> list[str]:
-    """Extrai as siglas de UF do GeoJSON."""
-    try:
-        return [feat["properties"]["SIGLA"] for feat in geojson.get("features", [])]
-    except Exception:
-        return []
+        for feature in geojson.get("features", []):
+            sigla = feature.get("properties", {}).get("SIGLA")
+            if sigla:
+                feature["properties"]["name"] = sigla
+
+        return geojson
+    except Exception as e:
+        st.error(f"Erro ao carregar geojson: {e}")
+        return None

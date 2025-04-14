@@ -1,8 +1,8 @@
 # app/constants/texts.py
 
 # === TÍTULOS DAS PÁGINAS ===
-TITLE_BRASILEIRAO = "Análise do Brasileirão"
-TITLE_TRANSFERENCIAS = "Transferências dos Clubes da Série A"
+TITLE_BRASILEIRAO = "Análise dos Clubes no Brasileirão - 2015 até 2024"
+TITLE_TRANSFERENCIAS = "Transferências dos Clubes - 2015 até 2024"
 TITLE_DASHBOARD_APP = "Dashboards de Análise"
 
 # === BARRA LATERAL ===
