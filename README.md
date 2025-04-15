@@ -1,65 +1,85 @@
-# Football Analysis
+# ⚽ Football Analysis BR
 
-## Descrição
+Dashboard interativo para análise dos clubes da Série A do Campeonato Brasileiro. Este projeto une dados financeiros, desempenho esportivo e transferência de atletas em uma plataforma moderna e responsiva desenvolvida com **Python + Streamlit**.
 
-Este projeto avançado de Análise de Dados busca compreender a relação entre os gastos financeiros, dívidas e sucesso esportivo de todos os clubes da Série A do Campeonato Brasileiro nos últimos 10 anos. Utilizando dashboards interativos e ferramentas de visualização, o objetivo é responder questões críticas sobre a gestão financeira e o desempenho esportivo dos clubes.
+## ✨ Destaques
 
-As principais tecnologias utilizadas serão:
-- **Power BI**
-- **Streamlit + Python**
-- **Pandas e NumPy para manipulação de dados**
-- **Matplotlib, Seaborn e Plotly para visualização**
-- **PostgreSQL para armazenamento dos dados estruturados**
-- **APIs e Web Scraping para coleta de dados**
+- 🎨 **Tema claro/escuro com detecção automática**
+- 📊 **Gráficos interativos usando Streamlit ECharts**
+- 🧱 **Arquitetura modular, escalável e fácil de manter**
 
-## Objetivos
-- Analisar os investimentos dos clubes e seu impacto nos resultados esportivos.
-- Estudar o endividamento dos clubes e como isso afeta sua sustentabilidade financeira.
-- Construir dashboards interativos para visualizar os padrões e tendências financeiras e esportivas.
+## 📌 Tecnologias Utilizadas
 
-## Coleta de Dados
+- **Python 3.13+**
+- **Streamlit + ECharts**
+- **Pandas, NumPy, Plotly**
+- **PostgreSQL (opcional para futura expansão)**
+- **CSS customizado via injeção direta**
+- **Fontes tipográficas com Google Fonts**
 
-### Fontes de Dados:
-Os dados serão coletados a partir de diversas fontes, incluindo:
-- **APIs esportivas** para estatísticas de partidas e desempenho dos clubes.
-- **Web Scraping** em sites de finanças e relatórios contábeis dos clubes.
-- **Banco de dados históricos** de campeonatos e resultados.
+## 📁 Estrutura do Projeto
 
-### Web Scraping e APIs
-Serão utilizadas ferramentas como **BeautifulSoup** e **Selenium** para coletar dados financeiros de relatórios anuais e balanços dos clubes. APIs esportivas fornecerão estatísticas sobre partidas, jogadores e classificação ao longo dos anos. Ambos serão feitos no meu projeto [Football Science](https://github.com/renanmrbraga/footballscience).
-
-## Instalação e Configuração
-
-### 1. Clonar o repositório
-```bash
-git clone https://github.com/renanmrbraga/footballanalysis.git
-cd footballanalysis
+```
+📁 app/
+│   ├── dashboards/           # Dashboards interativos (Clubes, Transferências)
+│   ├── components/           # Componentes visuais reutilizáveis (gráficos, mapas, etc.)
+│   ├── constants/            # Cores, temas, paths, textos
+│   └── utils/                # Funções auxiliares e carregamento de dados
+📁 data/
+│   ├── external/             # Dados brutos obtidos via scraping ou APIs
+│   ├── processed/            # Dados tratados e prontos para uso
+│   └── images/               # Recursos visuais
+📄 run.py                     # Entrypoint da aplicação
 ```
 
-### 2. Criar e ativar um ambiente virtual
+## 🚀 Como Rodar Localmente
+
+### 1. Clone o repositório
 ```bash
-python3 -m venv venv
-source venv/bin/activate  # Para Linux/macOS
-venv\Scripts\activate     # Para Windows
+git clone https://github.com/renanmrbraga/football-analysis.git
+cd football-analysis
 ```
 
-### 3. Instalar dependências
+### 2. Crie e ative um ambiente virtual
+```bash
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+# ou
+source .venv/bin/activate  # Linux/Mac
+```
+
+### 3. Instale as dependências
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Iniciar o Dashboard
+### 4. Execute o app
 ```bash
 streamlit run run.py
 ```
 
-## Contribuição
-Se quiser contribuir para este projeto, siga os passos:
-1. **Fork** o repositório
-2. Crie uma **branch** para sua funcionalidade (`git checkout -b minha-feature`)
-3. Commit suas mudanças (`git commit -m 'Adicionando nova feature'`)
-4. Faça **push** para a branch (`git push origin minha-feature`)
-5. Abra um **Pull Request**
+## 📈 Funcionalidades Atuais
 
-## Licença
-Este projeto está sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+- 📌 **Dashboard de Clubes**: evolução de participações na Série A, desempenho, aproveitamento e top clubes com maiores gastos.
+- 📌 **Dashboard de Transferências**: comparação por tipo de transferência, mapa interativo por estado e série histórica de gastos.
+- 🔄 **Switch dinâmico entre temas** com consistência visual garantida.
+
+## 🧩 Próximas Etapas
+
+- Integração com base de dados PostgreSQL para persistência
+- Painel de filtros avançados por temporada, posição, e região
+- Deploy via Streamlit Cloud com URL pública
+
+## 🤝 Contribuições
+
+Contribuições são bem-vindas!
+
+1. Faça um **fork**
+2. Crie sua branch: `git checkout -b minha-feature`
+3. Commit: `git commit -m 'feat: nova funcionalidade'`
+4. Push: `git push origin minha-feature`
+5. Abra um Pull Request
+
+## 🪪 Licença
+
+Distribuído sob a licença MIT. Veja [LICENSE](LICENSE) para mais informações.
