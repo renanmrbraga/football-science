@@ -2,48 +2,62 @@
 import streamlit as st
 import logging
 
-st.set_page_config(page_title="Football Analysis BR", page_icon="⚽", layout="wide")
-
-# Importa funções de tema e CSS
-from app.constants.theme import init_theme, get_theme_styles
-from app.components.css import inject_custom_css
+from app.constants.css import inject_custom_css
 from app.dashboards.clubes_dashboard import dashboard_clubes
 from app.dashboards.transferencias_dashboard import dashboard_transferencias
 
-logging.basicConfig(level=logging.INFO)
 
-# Inicializa o seletor de tema (aparece UMA única vez na sidebar)
-init_theme()
+def main():
+    # Configuração global da página
+    st.set_page_config(
+        page_title="Football Analysis BR",
+        page_icon="⚽",
+        layout="wide"
+    )
+    logging.basicConfig(level=logging.INFO)
 
-# Injeta CSS customizado (usando o tema atualmente selecionado)
-inject_custom_css()
+    # === SIDEBAR: Tema e Navegação ===
+    with st.sidebar:
+        st.title("⚙️ Personalização")
 
-# Agora obtemos os estilos do tema para eventuais ajustes extras
-theme = get_theme_styles()
+        # Detecta ou inicializa o tema do navegador
+        if "chosen_theme" not in st.session_state:
+            st.session_state["chosen_theme"] = st.get_option("theme.base") or "dark"
+            st.session_state["theme_changed"] = False
 
-st.markdown(f"""
-    <style>
-    section[data-testid="stSidebar"] * {{
-        color: {theme['FOREGROUND_COLOR']} !important;
-    }}
-    section[data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] * {{
-        color: black !important;
-    }}
-    section[data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] {{
-        background-color: white !important;
-    }}
-    </style>
-""", unsafe_allow_html=True)
+        selected_theme = st.selectbox(
+            "Tema",
+            ["dark", "light"],
+            index=0 if st.session_state["chosen_theme"] == "dark" else 1
+        )
 
-def main() -> None:
-    dashboard_options = {
+        if selected_theme != st.session_state["chosen_theme"]:
+            st.session_state["chosen_theme"] = selected_theme
+            st.session_state["theme_changed"] = True
+        else:
+            st.session_state["theme_changed"] = False
+
+        # Navegação entre dashboards
+        st.title("📂 Navegação")
+        if "dashboard" not in st.session_state:
+            st.session_state["dashboard"] = "Clubes"
+
+        st.session_state["dashboard"] = st.radio(
+            "Selecione o dashboard:",
+            ["Clubes", "Transferências"],
+            index=["Clubes", "Transferências"].index(st.session_state["dashboard"])
+        )
+
+    # === CSS customizado global ===
+    inject_custom_css()
+
+    # === Renderiza o dashboard selecionado ===
+    dashboards = {
         "Clubes": dashboard_clubes,
         "Transferências": dashboard_transferencias
     }
+    dashboards[st.session_state["dashboard"]]()
 
-    st.sidebar.title("📂 Navegação")
-    escolha = st.sidebar.radio("Selecione o dashboard:", list(dashboard_options.keys()), key="unique_dashboard_radio")
-    dashboard_options[escolha]()
 
 if __name__ == "__main__":
     main()

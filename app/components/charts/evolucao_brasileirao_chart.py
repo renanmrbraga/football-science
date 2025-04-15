@@ -1,107 +1,84 @@
-# app/components/charts/evolucao_brasileiro_chart.py
-import streamlit as st
-import json
-from app.constants.theme import get_theme_styles  # Corrigido para importar a função
-
-# Acessando os estilos do tema
-theme = get_theme_styles()
-CHART_TEXT_STYLE = theme["CHART_TEXT_STYLE"]
-CHART_AXIS_LABEL_STYLE = theme["CHART_AXIS_LABEL_STYLE"]
+# app/components/charts/evolucao_brasileirao_chart.py
+from streamlit_echarts import st_echarts, JsCode
+from app.constants.theme import get_theme_styles
 
 def render_evolucao_brasileirao_chart(df_brasileirao_clube, chart_title: str) -> None:
+    import streamlit as st
+
     if df_brasileirao_clube.empty or "Ano" not in df_brasileirao_clube or "Posição" not in df_brasileirao_clube:
         st.warning("Dados insuficientes para exibir o gráfico de evolução no Brasileirão.")
         return
 
-    df_sorted = df_brasileirao_clube.sort_values("Ano")
-    anos = df_sorted["Ano"].astype(str).tolist()
-    posicoes = df_sorted["Posição"].fillna(0).astype(int).tolist()
+    theme = get_theme_styles()
+    anos = df_brasileirao_clube.sort_values("Ano")["Ano"].astype(str).tolist()
+    posicoes = df_brasileirao_clube.sort_values("Ano")["Posição"].fillna(0).astype(int).tolist()
 
-    chart_data = {
-        "anos": anos,
-        "posicoes": posicoes,
-        "title": chart_title,
-        "textColor": CHART_TEXT_STYLE["color"],
-        "pointColor": "#00c6ff"  # cor azul da bolinha
+    options = {
+        "title": {
+            "text": chart_title,
+            "textStyle": theme["CHART_TEXT_STYLE"]
+        },
+        "tooltip": {
+            "trigger": "axis",
+            "axisPointer": {"type": "shadow"},
+            "backgroundColor": theme["CHART_TOOLTIP_STYLE"]["backgroundColor"],
+            "borderColor": theme["CHART_TOOLTIP_STYLE"]["borderColor"],
+            "textStyle": theme["CHART_TOOLTIP_STYLE"]["textStyle"]
+        },
+        "xAxis": {
+            "type": "category",
+            "name": "Ano",
+            "nameLocation": "center",
+            "nameGap": 25,
+            "nameTextStyle": theme["CHART_AXIS_TITLE_STYLE"],
+            "data": anos,
+            "boundaryGap": False,
+            "axisLabel": theme["CHART_AXIS_LABEL_STYLE"],
+            "axisLine": theme["CHART_AXIS_LINE_STYLE"],
+            "splitLine": {
+                "show": True,
+                "lineStyle": {"color": theme["CHART_GRIDLINE_COLOR"]}
+            }
+        },
+        "yAxis": {
+            "type": "value",
+            "name": "Posição",
+            "nameLocation": "middle",
+            "nameGap": 35,
+            "nameTextStyle": theme["CHART_AXIS_TITLE_STYLE"],
+            "inverse": True,
+            "min": 1,
+            "max": 20,
+            "interval": 1,
+            "axisLabel": {
+                "color": theme["CHART_AXIS_LABEL_STYLE"]["color"],
+                "formatter": JsCode("function (value) { return [1,5,10,15,20].includes(value) ? value : ''; }").js_code
+            },
+            "axisLine": theme["CHART_AXIS_LINE_STYLE"],
+            "splitLine": {
+                "show": True,
+                "lineStyle": {"color": theme["CHART_GRIDLINE_COLOR"]}
+            }
+        },
+        "series": [{
+            "name": "Posição",
+            "data": posicoes,
+            "type": "line",
+            "smooth": True,
+            "symbol": "circle",
+            "symbolSize": 10,
+            "lineStyle": {
+                "width": 3,
+                "color": theme["CHART_LINE_COLOR"]
+            },
+            "itemStyle": {
+                "color": theme["CHART_POINT_COLOR"]
+            },
+            "areaStyle": {
+                "origin": "end",
+                "color": theme["CHART_AREA_GRADIENT"]
+            }
+        }]
     }
 
-    container = f"""
-    <div id="grafico-posicoes" style="width: 100%; height: 400px;"></div>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-    <script>
-        var chart = echarts.init(document.getElementById('grafico-posicoes'));
-
-        var option = {{
-            title: {{
-                text: {json.dumps(chart_data["title"])},
-                textStyle: {{
-                    color: '{chart_data["textColor"]}',
-                    fontWeight: 'bold',
-                    fontSize: 14
-                }}
-            }},
-            tooltip: {{
-                trigger: 'axis'
-            }},
-            xAxis: {{
-                type: 'category',
-                boundaryGap: false,
-                data: {json.dumps(chart_data["anos"])},
-                axisLabel: {{
-                    color: '{chart_data["textColor"]}'
-                }},
-                axisLine: {{
-                    lineStyle: {{ color: '{chart_data["textColor"]}' }}
-                }}
-            }},
-            yAxis: {{
-                type: 'value',
-                inverse: true,
-                min: 1,
-                max: 20,
-                interval: 1,
-                axisLabel: {{
-                    color: '{chart_data["textColor"]}',
-                    formatter: function(value) {{
-                        return [1,5,10,15,20].includes(value) ? value : '';
-                    }}
-                }},
-                axisLine: {{
-                    lineStyle: {{ color: '{chart_data["textColor"]}' }}
-                }},
-                splitLine: {{
-                    lineStyle: {{ color: '#333' }}
-                }}
-            }},
-            series: [{{
-                data: {json.dumps(chart_data["posicoes"])},
-                type: 'line',
-                smooth: true,
-                symbol: 'circle',
-                symbolSize: 10,
-                lineStyle: {{
-                    width: 3,
-                    color: '{chart_data["textColor"]}'
-                }},
-                itemStyle: {{
-                    color: '{chart_data["pointColor"]}'
-                }},
-                areaStyle: {{
-                    origin: 'end',  // CORREÇÃO: gradiente desce a partir do fim da linha
-                    color: {{
-                        type: 'linear',
-                        x: 0, y: 0, x2: 0, y2: 1,
-                        colorStops: [
-                            {{ offset: 0, color: 'rgba(0,198,255,0.35)' }},
-                            {{ offset: 1, color: 'rgba(0,114,255,0.05)' }}
-                        ]
-                    }}
-                }}
-            }}]
-        }};
-
-        chart.setOption(option);
-    </script>
-    """
-
-    st.components.v1.html(container, height=500)
+    st_echarts(options=options, height="500px")

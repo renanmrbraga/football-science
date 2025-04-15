@@ -1,73 +1,89 @@
 # app/components/charts/gastos_por_ano_chart.py
-from streamlit_echarts import st_echarts
-from app.constants.echarts import GRADIENT_VERTICAL
-from app.constants.theme import get_theme_styles  # Ajuste para acessar os estilos do tema
-
-# Obter os estilos do tema
-theme = get_theme_styles()
+from streamlit_echarts import st_echarts, JsCode
+from app.constants.theme import get_theme_styles
 
 def render_gastos_por_ano_chart(df_entrada, chart_title: str) -> None:
-    df_ano = (
-        df_entrada.groupby("Ano")["Valor"]
-        .sum()
-        .reset_index()
-        .sort_values("Ano")
-    )
+    import streamlit as st
 
+    if df_entrada.empty or "Ano" not in df_entrada or "Valor" not in df_entrada:
+        st.warning("Dados insuficientes para exibir o gráfico de gastos.")
+        return
+
+    theme = get_theme_styles()
+    df_ano = df_entrada.groupby("Ano")["Valor"].sum().reset_index().sort_values("Ano")
     anos = df_ano["Ano"].astype(str).tolist()
     valores = df_ano["Valor"].astype(float).tolist()
 
     options = {
         "title": {
             "text": chart_title,
-            "textStyle": {
-                "color": theme["FOREGROUND_COLOR"],
-                "fontWeight": "bold",
-                "fontSize": 14
-            }
+            "textStyle": theme["CHART_TEXT_STYLE"]
+        },
+        "grid": {
+            "left": "130px",
         },
         "tooltip": {
             "trigger": "axis",
             "axisPointer": {"type": "line"},
-            "backgroundColor": theme["TOOLTIP_BG"],
-            "borderColor": theme["PRIMARY_BLUE"],
-            "textStyle": {"color": theme["TOOLTIP_TEXT"]},
-            "formatter": "{b}<br/>{a0}: {c0}"
+            "backgroundColor": theme["CHART_TOOLTIP_STYLE"]["backgroundColor"],
+            "borderColor": theme["CHART_TOOLTIP_STYLE"]["borderColor"],
+            "textStyle": theme["CHART_TOOLTIP_STYLE"]["textStyle"],
+            "formatter": JsCode(
+                "function(params) {"
+                "  return params[0].name + '<br/>' + "
+                "    params.map(p => p.marker + ' ' + p.seriesName + ': R$ ' + "
+                "    p.value.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})"
+                "  ).join('<br/>');"
+                "}"
+            ).js_code
         },
         "xAxis": {
             "type": "category",
+            "name": "Ano",
+            "nameLocation": "center",
+            "nameGap": 30,
+            "nameTextStyle": theme["CHART_AXIS_TITLE_STYLE"],
             "data": anos,
-            "axisLabel": {
-                "color": theme["FOREGROUND_COLOR"]
-            },
-            "axisLine": {
-                "lineStyle": {"color": theme["FOREGROUND_COLOR"]}
+            "axisLabel": theme["CHART_AXIS_LABEL_STYLE"],
+            "axisLine": theme["CHART_AXIS_LINE_STYLE"],
+            "splitLine": {
+                "show": True,
+                "lineStyle": {"color": theme["CHART_GRIDLINE_COLOR"]}
             }
         },
         "yAxis": {
             "type": "value",
+            # Título removido
             "axisLabel": {
-                "color": theme["FOREGROUND_COLOR"]
+                "color": theme["CHART_AXIS_LABEL_STYLE"]["color"],
+                "formatter": JsCode(
+                    "function(value){return 'R$ ' + value.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});}"
+                ).js_code
             },
-            "axisLine": {
-                "lineStyle": {"color": theme["FOREGROUND_COLOR"]}
-            },
+            "axisLine": theme["CHART_AXIS_LINE_STYLE"],
             "splitLine": {
-                "lineStyle": {"color": "#333"}
+                "show": True,
+                "lineStyle": {"color": theme["CHART_GRIDLINE_COLOR"]}
             }
         },
         "series": [{
-            "name": "Gastos",  # <--- Isso remove o 'series0' do tooltip
+            "name": "Gastos",
             "data": valores,
             "type": "line",
             "smooth": True,
-            "areaStyle": {
-                "color": GRADIENT_VERTICAL,
-                "opacity": 0.25
-            },
-            "lineStyle": {"width": 3, "color": theme["FOREGROUND_COLOR"]},
             "symbol": "circle",
-            "symbolSize": 10
+            "symbolSize": 10,
+            "lineStyle": {
+                "width": 3,
+                "color": theme["CHART_LINE_COLOR"]
+            },
+            "itemStyle": {
+                "color": theme["CHART_POINT_COLOR"]
+            },
+            "areaStyle": {
+                "origin": "auto",
+                "color": theme["CHART_AREA_GRADIENT"]
+            }
         }]
     }
 

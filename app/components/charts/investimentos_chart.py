@@ -1,14 +1,16 @@
 # app/components/charts/investimentos_chart.py
-from streamlit_echarts import st_echarts
-from app.constants.theme import get_theme_styles  # Atualização para usar a função
-
-# Obtendo os estilos do tema
-theme = get_theme_styles()
-CHART_TEXT_STYLE = theme["CHART_TEXT_STYLE"]
-CHART_AXIS_LABEL_STYLE = theme["CHART_AXIS_LABEL_STYLE"]
-CHART_TOOLTIP_STYLE = theme["CHART_TOOLTIP_STYLE"]
+from streamlit_echarts import st_echarts, JsCode
+from app.constants.theme import get_theme_styles
 
 def render_investimentos_chart(df_transf_clube, chart_title: str) -> None:
+    import streamlit as st
+
+    if df_transf_clube.empty or "Ano" not in df_transf_clube or "Tipo" not in df_transf_clube or "Valor" not in df_transf_clube:
+        st.warning("Dados insuficientes para exibir o gráfico.")
+        return
+
+    theme = get_theme_styles()
+
     df_grouped = (
         df_transf_clube.groupby(["Ano", "Tipo"])["Valor"]
         .sum()
@@ -18,31 +20,13 @@ def render_investimentos_chart(df_transf_clube, chart_title: str) -> None:
     anos = sorted(df_grouped["Ano"].unique())
     tipos = df_grouped["Tipo"].unique()
 
-    GRADIENT_ENTRADA = {
-        "type": "linear",
-        "x": 0, "y": 0, "x2": 1, "y2": 0,
-        "colorStops": [
-            {"offset": 0, "color": "#00c6ff"},
-            {"offset": 1, "color": "#003366"}
-        ]
-    }
-
-    GRADIENT_SAIDA = {
-        "type": "linear",
-        "x": 0, "y": 0, "x2": 1, "y2": 0,
-        "colorStops": [
-            {"offset": 0, "color": "#b14cff"},
-            {"offset": 1, "color": "#3e0099"}
-        ]
-    }
-
     series_data = []
     for tipo in tipos:
         valores = [
             float(df_grouped[(df_grouped["Ano"] == ano) & (df_grouped["Tipo"] == tipo)]["Valor"].sum())
             for ano in anos
         ]
-        gradient = GRADIENT_ENTRADA if tipo.lower() == "entrada" else GRADIENT_SAIDA
+        gradient = theme["BAR_GRADIENT_ENTRADA"] if tipo.lower() == "entrada" else theme["BAR_GRADIENT_SAIDA"]
 
         series_data.append({
             "name": tipo,
@@ -51,37 +35,64 @@ def render_investimentos_chart(df_transf_clube, chart_title: str) -> None:
             "data": valores,
             "itemStyle": {
                 "color": gradient,
-                "opacity": 0.95
+                "opacity": 0.9
             }
         })
 
     options = {
         "title": {
             "text": chart_title,
-            "textStyle": CHART_TEXT_STYLE
+            "textStyle": theme["CHART_TEXT_STYLE"]
         },
         "tooltip": {
             "trigger": "axis",
             "axisPointer": {"type": "shadow"},
-            "backgroundColor": CHART_TOOLTIP_STYLE["backgroundColor"],
-            "borderColor": CHART_TOOLTIP_STYLE["borderColor"],
-            "textStyle": CHART_TOOLTIP_STYLE["textStyle"],
-            "formatter": "{b}<br/>{a0}: {c0}<br/>{a1}: {c1}"
+            "backgroundColor": theme["CHART_TOOLTIP_STYLE"]["backgroundColor"],
+            "borderColor": theme["CHART_TOOLTIP_STYLE"]["borderColor"],
+            "textStyle": theme["CHART_TOOLTIP_STYLE"]["textStyle"],
+            "formatter": JsCode(
+                "function(params){"
+                "  return params[0].name + '<br/>' + "
+                "    params.map(p => p.marker + ' ' + p.seriesName + ': R$ ' + "
+                "    p.value.toLocaleString('pt-BR', {minimumFractionDigits: 2})"
+                "  ).join('<br/>');"
+                "}"
+            ).js_code
         },
         "legend": {
-            "textStyle": {"color": CHART_TEXT_STYLE["color"]}
+            "textStyle": {"color": theme["CHART_TEXT_STYLE"]["color"]}
+        },
+        "grid": {
+            "left": "120px"
         },
         "xAxis": {
             "type": "category",
+            "name": "Ano",
+            "nameLocation": "center",
+            "nameGap": 30,
+            "nameTextStyle": theme["CHART_AXIS_TITLE_STYLE"],
             "data": [str(ano) for ano in anos],
-            "axisLabel": CHART_AXIS_LABEL_STYLE,
-            "axisLine": {"lineStyle": {"color": CHART_AXIS_LABEL_STYLE["color"]}}
+            "axisLabel": theme["CHART_AXIS_LABEL_STYLE"],
+            "axisLine": theme["CHART_AXIS_LINE_STYLE"],
+            "splitLine": {
+                "show": True,
+                "lineStyle": {"color": theme["CHART_GRIDLINE_COLOR"]}
+            }
         },
         "yAxis": {
             "type": "value",
-            "axisLabel": CHART_AXIS_LABEL_STYLE,
-            "axisLine": {"lineStyle": {"color": CHART_AXIS_LABEL_STYLE["color"]}},
-            "splitLine": {"lineStyle": {"color": "#333"}}
+            # Título do eixo Y removido
+            "axisLabel": {
+                "color": theme["CHART_AXIS_LABEL_STYLE"]["color"],
+                "formatter": JsCode(
+                    "function(value){return 'R$ ' + value.toLocaleString('pt-BR', {minimumFractionDigits: 2});}"
+                ).js_code
+            },
+            "axisLine": theme["CHART_AXIS_LINE_STYLE"],
+            "splitLine": {
+                "show": True,
+                "lineStyle": {"color": theme["CHART_GRIDLINE_COLOR"]}
+            }
         },
         "series": series_data
     }
