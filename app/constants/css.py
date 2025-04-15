@@ -3,11 +3,9 @@ import streamlit as st
 from app.constants.theme import get_theme_styles
 
 def inject_custom_css() -> None:
-    """Injeta CSS customizado com base no tema atual (claro/escuro)."""
     styles = get_theme_styles()
 
     is_light_theme = styles["BACKGROUND_COLOR"].strip().lower() == "#ffffff"
-
     selectbox_bg = "#ffffff" if is_light_theme else "var(--card-bg)"
     selectbox_text = "#000000" if is_light_theme else "var(--text-color)"
     dropdown_bg = "#ffffff" if is_light_theme else "var(--card-bg)"
@@ -18,7 +16,6 @@ def inject_custom_css() -> None:
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap');
 
-    /* === VARIÁVEIS DE TEMA === */
     :root {{
         --primary-color: {styles['HIGHLIGHT_COLOR']};
         --secondary-color: {styles['PRIMARY_BLUE']};
@@ -27,7 +24,6 @@ def inject_custom_css() -> None:
         --card-bg: {styles['CARD_BACKGROUND']};
     }}
 
-    /* === ESTILOS GLOBAIS === */
     html, body, [data-testid="stApp"], [data-testid="stAppViewContainer"] {{
         background-color: var(--bg-color) !important;
         color: var(--text-color) !important;
@@ -53,7 +49,6 @@ def inject_custom_css() -> None:
         color: var(--text-color) !important;
     }}
 
-    /* === BOTÕES === */
     .stButton > button {{
         background-color: var(--secondary-color);
         color: white;
@@ -61,6 +56,7 @@ def inject_custom_css() -> None:
         font-weight: bold;
         padding: 0.5rem 1.25rem;
         transition: all 0.3s ease-in-out;
+        width: auto;
     }}
 
     .stButton > button:hover {{
@@ -68,7 +64,6 @@ def inject_custom_css() -> None:
         transform: scale(1.05);
     }}
 
-    /* === TABELAS E MÉTRICAS === */
     .stDataFrame, .stTable, .stMetric {{
         background-color: var(--card-bg) !important;
         border-radius: 0.75rem;
@@ -76,7 +71,6 @@ def inject_custom_css() -> None:
         box-shadow: 0 0 6px rgba(0,198,255,0.08);
     }}
 
-    /* === SIDEBAR === */
     section[data-testid="stSidebar"] {{
         background-color: var(--card-bg) !important;
     }}
@@ -85,7 +79,6 @@ def inject_custom_css() -> None:
         color: var(--text-color) !important;
     }}
 
-    /* === SELECTBOX (tema adaptável) === */
     section[data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] {{
         background: {selectbox_bg} !important;
         color: {selectbox_text} !important;
@@ -117,9 +110,41 @@ def inject_custom_css() -> None:
         color: #ffffff !important;
     }}
 
-    /* === CORRIGE CONTAINER TRANSPARENTE === */
     div.block-container > div > div > div {{
         background-color: transparent !important;
+    }}
+
+    /* ========== MOBILE RESPONSIVE ========== */
+    @media (max-width: 768px) {{
+        .block-container {{
+            padding: 1rem 1.5rem !important;
+        }}
+
+        .stButton > button {{
+            width: 100% !important;
+            font-size: 14px !important;
+        }}
+
+        .stSelectbox div[data-baseweb="select"],
+        ul[role="listbox"] > li {{
+            font-size: 14px !important;
+        }}
+
+        h1 {{ font-size: 1.6rem !important; }}
+        h2 {{ font-size: 1.4rem !important; }}
+        h3 {{ font-size: 1.2rem !important; }}
+
+        .stMetric > div {{
+            text-align: center;
+        }}
+
+        .element-container {{
+            margin-bottom: 1rem !important;
+        }}
+
+        .stRadio > div {{
+            flex-direction: column !important;
+        }}
     }}
     </style>
     """

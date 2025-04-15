@@ -1,14 +1,10 @@
 # app/components/transferencias_dashboard.py
 import streamlit as st
-
-from app.utils.data import load_data, enrich_with_uf, ensure_all_ufs
-from app.utils.geo import load_geojson
+from app.utils.data import load_data, enrich_with_uf
 from app.utils.data_extractor import (
-    get_valor_total_gasto, get_total_contratacoes, get_total_emprestimos,
-    get_contratacoes_com_custo, get_contratacoes_gratuitas,
-    get_ticket_medio, get_ticket_medio_com_custo
+    get_valor_total_gasto, get_total_contratacoes, get_contratacoes_com_custo,
+    get_ticket_medio_com_custo
 )
-from app.utils.formatters import format_currency, format_int
 from app.constants.paths import CLUBES_CSV, TRANSFERENCIAS_CSV
 from app.constants.texts import TITLE_TRANSFERENCIAS, WARNING_EMPTY_ENTRADAS, CHARTS
 from app.components.cards.valor_total_gasto_card import render_valor_total_gasto_card
@@ -37,38 +33,27 @@ def dashboard_transferencias():
         st.warning(WARNING_EMPTY_ENTRADAS)
         st.stop()
 
-    # Extração de métricas com funções reutilizáveis
     valor_total_gasto = get_valor_total_gasto(df_entrada)
     total_contratacoes = get_total_contratacoes(df_entrada)
     contratacoes_com_custo = get_contratacoes_com_custo(df_entrada)
     ticket_medio_com_custo = get_ticket_medio_com_custo(df_entrada)
 
-    # Indicadores
     st.subheader("Indicadores Gerais")
+    cols = st.columns(2 if st.session_state.get("is_mobile") else 4)
 
-    col1, col2, col3, col4 = st.columns(4)
-
-    with col1:
-        render_total_contratacoes_card(total_contratacoes)
-
-    with col2:
-        render_valor_total_gasto_card(valor_total_gasto)
-
-    with col3:
+    with cols[0]: render_total_contratacoes_card(total_contratacoes)
+    with cols[1]: render_valor_total_gasto_card(valor_total_gasto)
+    if len(cols) > 2:
+        with cols[2]: render_contratacoes_com_custo_card(contratacoes_com_custo)
+        with cols[3]: render_ticket_medio_com_custo_card(ticket_medio_com_custo)
+    else:
         render_contratacoes_com_custo_card(contratacoes_com_custo)
-
-    with col4:
         render_ticket_medio_com_custo_card(ticket_medio_com_custo)
 
-    # Gráficos
     st.subheader("Gráficos")
 
-    col1, col2 = st.columns(2)
-
-    with col1:
-        render_top_gastos_chart(df_entrada, CHARTS["top_gastos"])
-
-    with col2:
-        render_gastos_por_ano_chart(df_entrada, CHARTS["gastos_ano"])
+    col1, col2 = st.columns(1 if st.session_state.get("is_mobile") else 2)
+    with col1: render_top_gastos_chart(df_entrada, CHARTS["top_gastos"])
+    with col2: render_gastos_por_ano_chart(df_entrada, CHARTS["gastos_ano"])
 
     render_mapa_transferencias_chart(df_entrada, CHARTS["mapa_transferencias"])
