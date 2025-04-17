@@ -5,7 +5,7 @@ import logging
 from app.constants.css import inject_custom_css
 from app.dashboards.clubes_dashboard import dashboard_clubes
 from app.dashboards.transferencias_dashboard import dashboard_transferencias
-
+from app.utils.theme_tester import validar_contraste  # Caminho ajustado
 
 def main():
     # === Configuração da página ===
@@ -56,12 +56,16 @@ def main():
     # === CSS global ===
     inject_custom_css()
 
-    # === Renderiza ===
+    # === Validador de contraste ===
+    validar_contraste()
+
+    # === Renderiza o dashboard ===
     dashboards = {
         "Clubes": dashboard_clubes,
         "Transferências": dashboard_transferencias
     }
     dashboards[st.session_state["dashboard"]]()
+
 
 
 if __name__ == "__main__":

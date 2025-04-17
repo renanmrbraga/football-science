@@ -5,7 +5,7 @@ from app.constants.theme import get_theme_styles
 def inject_custom_css() -> None:
     styles = get_theme_styles()
 
-    is_light_theme = styles["BACKGROUND_COLOR"].strip().lower() == "#ffffff"
+    is_light_theme = styles["BACKGROUND_COLOR"].strip().lower() in ["#ffffff", "#fff", "white"]
     selectbox_bg = "#ffffff" if is_light_theme else "var(--card-bg)"
     selectbox_text = "#000000" if is_light_theme else "var(--text-color)"
     dropdown_bg = "#ffffff" if is_light_theme else "var(--card-bg)"
@@ -80,12 +80,18 @@ def inject_custom_css() -> None:
     }}
 
     section[data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] {{
-        background: {selectbox_bg} !important;
+        background-color: {selectbox_bg} !important;
         color: {selectbox_text} !important;
         border: 1px solid {border_color} !important;
         border-radius: 0.5rem !important;
         font-weight: bold !important;
+    }}
+
+    section[data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] * {{
+        color: {selectbox_text} !important;
+        background-color: {selectbox_bg} !important;
         -webkit-text-fill-color: {selectbox_text} !important;
+        border-color: {border_color} !important;
     }}
 
     section[data-testid="stSidebar"] .stSelectbox input[type="text"] {{
@@ -98,11 +104,16 @@ def inject_custom_css() -> None:
 
     ul[role="listbox"] {{
         background: {dropdown_bg} !important;
+        border-radius: 0.5rem !important;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.15) !important;
+        padding: 0.5rem !important;
     }}
 
     ul[role="listbox"] > li {{
         color: {dropdown_text} !important;
         background: {dropdown_bg} !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: 0.4rem !important;
     }}
 
     ul[role="listbox"] > li:hover {{
