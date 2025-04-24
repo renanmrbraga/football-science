@@ -1,8 +1,10 @@
 streamlit
-pandas
-plotly
-python-dotenv
-numpy
-requests
-streamlit_echarts
+streamlit-echarts
 streamlit-javascript
+pandas
+numpy
+python-dotenv
+requests
+selenium
+beautifulsoup4
+webdriver-manager

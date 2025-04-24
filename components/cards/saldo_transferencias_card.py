@@ -1,0 +1,42 @@
+# app/components/cards/saldo_transferencias_card.py
+import streamlit as st
+from constants.theme import get_theme_styles
+from utils.formatters import format_currency
+
+def render_saldo_transferencias_card(valor: float) -> None:
+    theme = get_theme_styles()
+    
+    card_style = (
+        f"background-color: {theme['CARD_BACKGROUND']};"
+        "padding: 1.2rem;"
+        "border-radius: 1rem;"
+        f"box-shadow: 0 0 15px {theme['HIGHLIGHT_COLOR']}55;"
+        "text-align: center;"
+        "min-width: 180px;"
+        "transition: all 0.3s ease;"
+    )
+
+    card_title_style = (
+        f"color: {theme['FOREGROUND_COLOR']};"
+        "margin-bottom: 0.5rem;"
+        "font-size: 1.05rem;"
+        "font-weight: 500;"
+    )
+
+    card_value_style = (
+        f"color: {theme['HIGHLIGHT_COLOR']};"
+        "margin: 0;"
+        "font-size: 1.6rem;"
+        "font-weight: bold;"
+    )
+
+    valor_formatado = f"R$ {format_currency(valor)}"
+    st.markdown(
+        f"""
+        <div style="{card_style}">
+            <h4 style="{card_title_style}">Saldo Transferências</h4>
+            <h2 style="{card_value_style}">{valor_formatado}</h2>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
