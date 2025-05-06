@@ -58,4 +58,4 @@ def render_rebaixamentos_seriea_chart(df_clubes, clube_1: str, clube_2: str | No
         }]
     }
 
-    st_echarts(options=options, height="400px")
+    st_echarts(options=options, height="350px")

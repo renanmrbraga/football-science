@@ -2,8 +2,10 @@
 def get_total_participacoes(df_info) -> int:
     return int(df_info["Participacoes_SerieA"])
 
-def get_media_pontos(df_info) -> float:
-    return round(df_info["Media_Pontos"], 2)
+def get_media_pontos(df_bras_clube) -> float:
+    # filtra linhas válidas
+    df = df_bras_clube[df_bras_clube["Pontos"].notna()]
+    return round(df["Pontos"].mean(), 2) if not df.empty else 0.0
 
 def get_ultimo_ano(df_info) -> int:
     return int(df_info["Ultimo_Ano_SerieA"])
@@ -49,10 +51,11 @@ def get_classificacao_media(df_bras_clube) -> float:
     return round(df["Posição"].mean(), 2) if not df.empty else 0
 
 def get_saldo_gols(df_bras_clube) -> int:
-    df = df_bras_clube.copy()
-    if "Gols Pró" in df.columns and "Gols Contra" in df.columns:
-        df["Saldo"] = df["Gols Pró"] - df["Gols Contra"]
-        return int(df["Saldo"].sum())
+    if "SG" in df_bras_clube.columns:
+        return int(df_bras_clube["SG"].sum())
+    if "GP" in df_bras_clube.columns and "GC" in df_bras_clube.columns:
+        diff = (df_bras_clube["GP"] - df_bras_clube["GC"]).sum()
+        return int(diff)
     return 0
 
 def get_gasto_medio(df_transf_clube) -> float:
@@ -65,3 +68,15 @@ def get_titulos_seriea(df_bras, clube):
     if "Posição" in df_clube.columns:
         return int((df_clube["Posição"] == 1).sum())
     return 0
+
+def get_vitorias(df_bras_clube) -> float:
+    # média de vitórias por temporada
+    return round(df_bras_clube["Vitórias"].mean(), 2) if "Vitórias" in df_bras_clube.columns else 0.0
+
+def get_derrotas(df_bras_clube) -> float:
+    # média de derrotas por temporada
+    return round(df_bras_clube["Derrotas"].mean(), 2) if "Derrotas" in df_bras_clube.columns else 0.0
+
+def get_empates(df_bras_clube) -> float:
+    # média de empates por temporada
+    return round(df_bras_clube["Empates"].mean(), 2) if "Empates" in df_bras_clube.columns else 0.0

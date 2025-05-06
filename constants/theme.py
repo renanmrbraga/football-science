@@ -15,7 +15,9 @@ LIGHT_THEME = {
     },
     "TOOLTIP_BG": "#ffffff",
     "TOOLTIP_TEXT": "#000000",
-    "RADIO_COLOR": "#1a60af"
+    "RADIO_COLOR": "#1a60af",
+    # Nova cor terciária para linhas de gráfico
+    "CHART_TERTIARY_COLOR": "#FF77AA"
 }
 
 DARK_THEME = {
@@ -31,7 +33,9 @@ DARK_THEME = {
     },
     "TOOLTIP_BG": "#222222",
     "TOOLTIP_TEXT": "#ffffff",
-    "RADIO_COLOR": "#00c6ff"
+    "RADIO_COLOR": "#00c6ff",
+    # Nova cor terciária para linhas de gráfico
+    "CHART_TERTIARY_COLOR": "#FF4F79"
 }
 
 THEMES = {
@@ -58,6 +62,7 @@ def init_theme():
     else:
         st.session_state["theme_changed"] = False
 
+
 def theme_changed():
     return st.session_state.get("theme_changed", False)
 
@@ -68,8 +73,8 @@ def get_theme_styles():
 
     # Estilos extras para gráficos
     if chosen == "dark":
-        primary_color = "#00c6ff"  # azul como principal
-        secondary_color = "#a7ff00"  # verde ácido como secundário
+        primary_color = theme["HIGHLIGHT_COLOR"]
+        secondary_color = "#a7ff00"
         gridline_color = "#333"
         axis_line_color = "#ccc"
         bar_gradient_entrada = {
@@ -94,8 +99,8 @@ def get_theme_styles():
             ]
         }
     else:
-        primary_color = "#1a60af"
-        secondary_color = "#6da800"
+        primary_color = theme["PRIMARY_BLUE"]
+        secondary_color = theme["HIGHLIGHT_COLOR"]
         gridline_color = "#aaa"
         axis_line_color = "#333"
         bar_gradient_entrada = {
@@ -130,6 +135,11 @@ def get_theme_styles():
         "RADIO_COLOR": theme.get("RADIO_COLOR", None),
         "TOOLTIP_BG": theme["TOOLTIP_BG"],
         "TOOLTIP_TEXT": theme["TOOLTIP_TEXT"],
+        "SELECTBOX_BG": "#ffffff" if theme["BACKGROUND_COLOR"].lower() in ["#ffffff", "#fff", "white"] else theme["CARD_BACKGROUND"],
+        "SELECTBOX_TEXT": "#000000" if theme["BACKGROUND_COLOR"].lower() in ["#ffffff", "#fff", "white"] else theme["FOREGROUND_COLOR"],
+        "DROPDOWN_BG": "#ffffff" if theme["BACKGROUND_COLOR"].lower() in ["#ffffff", "#fff", "white"] else theme["CARD_BACKGROUND"],
+        "DROPDOWN_TEXT": "#000000" if theme["BACKGROUND_COLOR"].lower() in ["#ffffff", "#fff", "white"] else theme["FOREGROUND_COLOR"],
+        "BORDER_COLOR": theme["HIGHLIGHT_COLOR"],
 
         # Gradientes
         "GRADIENT_HORIZONTAL": theme["GRADIENT"]["horizontal"],
@@ -176,17 +186,18 @@ def get_theme_styles():
         "CHART_TEXT_STYLE": {
             "color": theme["FOREGROUND_COLOR"],
             "fontWeight": "bold",
-            "fontSize": 14
+            "fontSize": 20
         },
         "CHART_AXIS_LABEL_STYLE": {
-            "color": theme["FOREGROUND_COLOR"]
+            "color": theme["FOREGROUND_COLOR"],
+            "fontSize": 12
         },
         "CHART_AXIS_LINE_STYLE": {
             "lineStyle": {"color": axis_line_color}
         },
         "CHART_AXIS_TITLE_STYLE": {
             "color": theme["FOREGROUND_COLOR"],
-            "fontSize": 18,
+            "fontSize": 12,
             "fontWeight": "bold"
         },
         "CHART_GRIDLINE_COLOR": gridline_color,
@@ -195,12 +206,12 @@ def get_theme_styles():
             "borderColor": theme["PRIMARY_BLUE"],
             "textStyle": {"color": theme["TOOLTIP_TEXT"]}
         },
-        "CHART_LINE_COLOR": primary_color,
-        "CHART_POINT_COLOR": secondary_color,
         "CHART_PRIMARY_COLOR": primary_color,
         "CHART_SECONDARY_COLOR": secondary_color,
+        # Nova cor terciária para linhas de gráfico
+        "CHART_TERTIARY_COLOR": theme["CHART_TERTIARY_COLOR"],
         "CHART_AREA_GRADIENT": area_gradient,
         "BAR_GRADIENT_ENTRADA": bar_gradient_entrada,
         "BAR_GRADIENT_SAIDA": bar_gradient_saida,
-        "CHART_RADAR_BG": ["#1d1d1d", "#121212", "transparent"] if chosen == "dark" else ["#ffffff", "#f0f2f6", "transparent"]
+        "CHART_RADAR_BG": ["#1d1d1d", "#121212", "transparent"] if chosen == "dark" else ["#ffffff", "#f0f2f6", "transparent"],
     }

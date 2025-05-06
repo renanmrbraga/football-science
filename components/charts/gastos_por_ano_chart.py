@@ -75,7 +75,7 @@ def render_gastos_por_ano_chart(df_entrada, chart_title: str) -> None:
             "symbolSize": 10,
             "lineStyle": {
                 "width": 3,
-                "color": theme["CHART_LINE_COLOR"]
+                "color": theme["CHART_PRIMARY_COLOR"]
             },
             "itemStyle": {
                 "color": theme["CHART_POINT_COLOR"]

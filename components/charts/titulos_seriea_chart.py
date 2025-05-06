@@ -56,4 +56,4 @@ def render_titulos_seriea_chart(df_bras, clube_1: str, clube_2: str | None = Non
         }]
     }
 
-    st_echarts(options=options, height="400px")
+    st_echarts(options=options, height="350px")

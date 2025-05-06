@@ -45,7 +45,7 @@ def main():
         # Navegação
         pagina = st.radio(
             "Selecione o dashboard:",
-            ["Clubes", "Transferências"]
+            ["Clubes - Série A", "Transferências"]
         )
 
     # === CSS global ===
@@ -56,7 +56,7 @@ def main():
 
     # === Renderiza o dashboard ===
     dashboards = {
-        "Clubes": dashboard_clubes_seriea,
+        "Clubes - Série A": dashboard_clubes_seriea,
         "Transferências": dashboard_transferencias
     }
     dashboards[pagina]()

@@ -69,7 +69,7 @@ def render_evolucao_brasileirao_chart(df_brasileirao_clube, chart_title: str) ->
             "symbolSize": 10,
             "lineStyle": {
                 "width": 3,
-                "color": theme["CHART_LINE_COLOR"]
+                "color": theme["CHART_PRIMARY_COLOR"]
             },
             "itemStyle": {
                 "color": theme["CHART_POINT_COLOR"]
