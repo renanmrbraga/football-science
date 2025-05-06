@@ -5,43 +5,66 @@ from constants.texts import TITLE_CLUBES
 from constants.css import inject_custom_css
 from utils.data import load_data, enrich_with_uf
 from components.charts.radar_indicadores_seriea_chart import render_kpi_radar_chart
-from components.charts.aproveitamento_temporada_chart import render_aproveitamento_temporada_chart
-from components.charts.gastos_transferencias_chart import render_gastos_transferencias_chart
+from components.charts.aproveitamento_temporada_chart import (
+    render_aproveitamento_temporada_chart,
+)
+from components.charts.gastos_transferencias_chart import (
+    render_gastos_transferencias_chart,
+)
 from components.charts.evolucao_eficiencia_chart import render_evolucao_eficiencia_chart
 from components.charts.titulos_seriea_chart import render_titulos_seriea_chart
-from components.charts.rebaixamentos_seriea_chart import render_rebaixamentos_seriea_chart
-from components.charts.participacoes_seriea_chart import render_participacoes_seriea_chart
+from components.charts.rebaixamentos_seriea_chart import (
+    render_rebaixamentos_seriea_chart,
+)
+from components.charts.participacoes_seriea_chart import (
+    render_participacoes_seriea_chart,
+)
+
 
 def dashboard_clubes_seriea():
     # === injeta CSS dinâmico ===
     inject_custom_css()
 
     # === Título ===
-    st.markdown("""
+    st.markdown(
+        """
     <div class="dashboard-header">
     <h1>Análise Estratégica dos Clubes na Série A</h1>
     <p>Compare clubes com base em desempenho, eficiência e investimento</p>
     </div>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
 
-    # === Carrega dados ===
-    df_clubes = load_data(CLUBES_CSV)
-    df_transf = load_data(TRANSFERENCIAS_CSV)
-    df_bras = load_data(BRASILEIRAO_CSV)
+    # === Carrega dados =======================================================
+    df_clubes = load_data(CLUBES_CSV)  # tem ID e Nome Oficial
+    df_transf = load_data(TRANSFERENCIAS_CSV)  # tem Clube_ID, falta Nome Oficial
+    df_bras = load_data(BRASILEIRAO_CSV)  # tem Clube, Pontos, Ano
+
     if df_clubes.empty or df_transf.empty or df_bras.empty:
         st.error("Erro ao carregar os dados. Verifique os arquivos.")
         return
 
-    # === Enriquecer e merge ===
-    df_transf = df_transf.merge(
-        df_clubes[["ID", "Nome Oficial"]],
-        left_on="Clube_ID", right_on="ID", how="left"
-    )
-    df_transf = enrich_with_uf(df_transf, df_clubes)
-    df_bras = df_bras.merge(
-        df_clubes[["ID", "Nome Oficial"]],
-        left_on="Clube", right_on="Nome Oficial", how="left"
-    )
+    # === Enriquecimento CONSISTENTE ==========================================
+    ## 1) TRANSFERÊNCIAS → adiciona Nome Oficial via Clube_ID
+    id2nome = df_clubes.set_index("ID")["Nome Oficial"]
+    df_transf["Nome Oficial"] = df_transf["Clube_ID"].map(id2nome)  # NaN se não achar
+    df_transf = enrich_with_uf(df_transf, df_clubes)  # UF p/ mapas, etc.
+
+    ## 2) BRASILEIRÃO → garante Nome Oficial sem perder colunas
+    if "Nome Oficial" not in df_bras.columns:
+        if "Clube" in df_bras.columns:
+            df_bras["Nome Oficial"] = df_bras["Clube"]
+        else:
+            st.error("CSV do Brasileirão não contém 'Clube' nem 'Nome Oficial'.")
+            return
+
+    # (opcional) sanity‑check rápido
+    cols_needed = {"Ano", "Pontos", "Nome Oficial"}
+    missing = cols_needed - set(df_bras.columns)
+    if missing:
+        st.error(f"df_bras está sem colunas essenciais: {sorted(missing)}")
+        return
 
     # === selects dentro de um wrapper para CSS específico ===
     st.markdown("#### Comparar clubes")
@@ -65,7 +88,7 @@ def dashboard_clubes_seriea():
     with col3:
         render_gastos_transferencias_chart(df_transf, clube_base, clube_comp)
     with col4:
-        render_evolucao_eficiencia_chart(df_transf, df_bras, clube_base, clube_comp)
+        render_evolucao_eficiencia_chart(df_bras, df_transf, clube_base, clube_comp)
 
     # === Histórico Competitivo ===
     st.subheader("Histórico Competitivo")
